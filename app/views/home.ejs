@@ -1,0 +1,13 @@
+<% include partials/header %>
+
+<h1>Authentication sample</h1>
+<a href="/signup">SignUp</a>
+<a href="/signin">SignIn</a>
+<a href="/secret">Go to secret page!</a>
+<% if(currentUser){ %>
+	<a href="/signout">SignOut</a>
+	<a href="/reset">Reset password</a>
+	<p>Current User : <%= currentUser.username %> | <%= currentUser._id %></p>
+<% } %>
+
+<% include partials/footer %>

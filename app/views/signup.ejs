@@ -1,0 +1,16 @@
+<% include partials/header %>
+
+<a href="/">Home</a>
+<h1>SignUp Form</h1>
+<% if(!currentUser){ %>
+	<form action="/signup" method="POST">
+	    <input type="text" name="username" placeholder="username">
+	    <input type="password" name="password" placeholder="password">
+	    <button>SignUp</button>
+	</form>
+	Existing user? <a href="/signin">SignIn here!</a>
+<% } else { %>
+	<h1>You are already signed in!</h1>
+<% } %>
+
+<% include partials/footer %>
