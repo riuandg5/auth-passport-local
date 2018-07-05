@@ -8,3 +8,11 @@
     <link rel="stylesheet" type="text/css" href="/css/style.css">
 </head>
 <body>
+<h3><em>
+	<% if(error.length > 0){ %>
+		<%= error %>
+	<% } %>
+	<% if(success.length > 0){ %>
+		<%= success %>
+	<% } %>
+</em></h3>

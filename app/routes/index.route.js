@@ -26,12 +26,14 @@ router.post("/signup", function(req, res){
     var newUser = new User({username: req.body.username});
     User.register(newUser, req.body.password, function(err, user){
         if(err){
-            console.log(err);
-            return res.render('signup');
+            req.flash("error", err.message);
+            res.redirect("/signup");
+        } else {
+            passport.authenticate("local")(req, res, function(){
+                req.flash("success", "Successfully signed up!");
+                res.redirect("/");
+            });
         }
-        passport.authenticate("local")(req, res, function(){
-           res.redirect("/");
-        });
     });
 });
 // route to signin form
@@ -39,7 +41,16 @@ router.get("/signin", function(req, res){
    res.render("signin"); 
 });
 // route to post signin form data
-router.post("/signin", passport.authenticate("local", {successRedirect: "/", failureRedirect: "/signin"}), function(req, res){
+router.post("/signin",
+    passport.authenticate(
+        "local",
+        {
+            successRedirect: "/",
+            failureRedirect: "/signin",
+            failureFlash: "Signin failed!",
+            successFlash: "Successfully signed in!"
+        }
+    ), function(req, res){
 });
 // route to password reset form
 router.get("/reset", middleware.isLoggedIn, function(req, res){
@@ -50,23 +61,29 @@ router.post("/reset", function(req, res){
     User.findById(req.body.uid, function(err, user){
         if(err){
             console.log(err);
-        }
-        user.setPassword(req.body.newpwd, function(err, user){
-            if(err){
-                console.log(err);
-            }
-            user.save(function(err){
+        } else if(user){
+            user.setPassword(req.body.newpwd, function(err, user){
                 if(err){
                     console.log(err);
                 }
-                res.redirect("/signout");
+                user.save(function(err){
+                    if(err){
+                        console.log(err);
+                    }
+                    req.flash("success", "Successfully changed password!");
+                    res.redirect("/");
+                });
             });
-        });
+        } else {
+            req.flash("error", `No user found by id : ${req.body.uid}`);
+            res.redirect("/reset");
+        }
     });
 });
 // route to signout
 router.get("/signout", function(req, res){
     req.logout();
+    req.flash("success", "Successfully signed out!");
     res.redirect("/");
 });
 // export express router to use in main app

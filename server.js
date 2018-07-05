@@ -3,8 +3,9 @@ var port  = process.env.PORT || 3079,
 // require npm packages
 var express       = require("express"),
     mongoose      = require("mongoose"),
-    passport      = require("passport"),
     bodyParser    = require("body-parser"),
+    flash         = require("connect-flash"),
+    passport      = require("passport"),
     LocalStrategy = require("passport-local"),
     app           = express();
 // require models
@@ -29,14 +30,19 @@ app.use(require("express-session")({
     resave: false,
     saveUninitialized: false
 }));
+app.use(flash()); // use flash for flash messages
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
-// middleware to tell that currentUser is req.user
+// middleware to send variables to every template page
 app.use(function(req, res, next){
+    // set currentUser to req.user
     res.locals.currentUser = req.user;
+    // success and error message variables for flash
+    res.locals.success = req.flash("success");
+    res.locals.error = req.flash("error");
     next();
 });
 // use body-parser
